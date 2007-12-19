@@ -1,0 +1,11 @@
+Revision history for WWW-Reddit
+
+0.02    2007-12-19    Andrew Moore <amoore@cpan.org>
+        * shooting for first CPAN release
+        * added WWW::Reddit::details method
+        * fixed prerequisites in Makefile.PL
+        * Added note in README about being a good netizen
+        * added META.yml file
+
+0.01    2007-12-13    Andrew Moore <amoore@cpan.org>
+        First version, released on an unsuspecting world.

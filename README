@@ -1,0 +1,52 @@
+WWW-Reddit
+
+reddit.com lets users post links to websites. This module lets you do
+that from your perl scripts.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+USAGE SUGGESTION
+
+Since this module interacts with the reddit.com site in an automated
+fashion, it makes it easy to become very rude to the community based
+around that website. You are advised to not use it in a way that the
+owners and operators of reddit.com would prefer you not. Just as you
+would not pollute that community manually, please do not write a
+program to do it for you.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WWW::Reddit
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Reddit
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WWW-Reddit
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WWW-Reddit
+
+    Search CPAN
+        http://search.cpan.org/dist/WWW-Reddit
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Andrew Moore
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
