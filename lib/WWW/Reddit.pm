@@ -12,11 +12,11 @@ WWW::Reddit - interface with reddit.com
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
-    our $VERSION = '0.02';
+    our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
@@ -91,12 +91,15 @@ Version 0.01
 
     add a URL to reddit.com
 
-    $r->post( url   => 'http://www.example.com'
-              title => 'The new and wonderful example website' );
+    my $id = $r->post( url   => 'http://www.example.com'
+                       title => 'The new and wonderful example website' );
 
     required parameters:
       url - the address of the url that you'd like to post
       title - the title that you would like to have appear on reddit.
+
+    returns: the string that represents the reddit ID of the URL
+    posted.
 
 =cut
 
@@ -157,6 +160,8 @@ Version 0.01
                       points    => undef,
                       upvotes   => undef,
                       downvotes => undef,
+                      url       => undef,
+                      title     => undef,
                  };
       
       my $body = $mech->content();
@@ -173,7 +178,10 @@ Version 0.01
       if ( $body =~ /down votes<\/td><td>(\d+)<\/td>/i ) {
           $details->{'downvotes'} = $1;
       }
-
+      if ( $body =~ /class="title loggedin\s*"\s*href="([^"]+)"\s*>(.+?)<\/a>/i ) {
+          $details->{'url'} = $1;
+          $details->{'title'} = $2;
+      }
       return $details;
 
     }
