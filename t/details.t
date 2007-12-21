@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use Test::More tests => 7;
+use Test::More tests => 17;
 use Data::Dumper;
 use Test::MockObject::Extends;
 
@@ -9,7 +9,13 @@ use WWW::Reddit;
 my $r = WWW::Reddit->new( username => '',
                           password => '' );
 
-$r->set_id( '63iup' );
+# with no ID, we should get undef
+$details = $r->details();
+ok( ! defined $details, 'details returns undef without ID' ) or
+  diag( Data::Dumper->Dump( [ $details ], [ 'details' ] ) );
+
+my $id = '63iup';
+$r->set_id( $id );
 
 my $mech = $r->get_mech();
 $mech = Test::MockObject::Extends->new( $mech );
@@ -19,15 +25,13 @@ $r->set_mech( $mech );
 
 my $details = $r->details();
 
-$mech->unmock();
-
 # $details = {
 #              'submitted' => '20 Dec 2007',
-#              'points' => '6',
-#              'upvotes' => '6',
+#              'points'    => '6',
+#              'upvotes'   => '6',
 #              'downvotes' => '0'
-#              'title' => 'perl module to interact with reddit - WWW::Reddit',
-#              'url' => 'http://search.cpan.org/~amoore/WWW-Reddit-0.02/',
+#              'title'     => 'perl module to interact with reddit - WWW::Reddit',
+#              'url'       => 'http://search.cpan.org/~amoore/WWW-Reddit-0.02/',
 #            };
 
 is( scalar( keys %$details ), 6, 'details returned 6 things' );
@@ -39,6 +43,25 @@ is( $details->{'title'},     'perl module to interact with reddit - WWW::Reddit'
 is( $details->{'url'},       'http://search.cpan.org/~amoore/WWW-Reddit-0.02/',   'url' );
 
 # diag( Data::Dumper->Dump( [ $details ], [ 'details' ] ) );
+
+
+# with no ID, we should get undef
+$r->set_id( undef );
+$details = $r->details();
+ok( ! defined $details, 'details returns undef without ID' );
+
+# Now, let's see if it works if we pass in the ID.
+$details = $r->details( $id );
+is( $r->get_id(), $id, 'we have set the ID' );
+is( scalar( keys %$details ), 6, 'details returned 6 things' );
+is( $details->{'submitted'}, '20 Dec 2007',                                       'submitted' );
+is( $details->{'points'},    '6',                                                 'points' );
+is( $details->{'upvotes'},   '6',                                                 'upvotes' );
+is( $details->{'downvotes'}, '0',                                                 'downvotes' );
+is( $details->{'title'},     'perl module to interact with reddit - WWW::Reddit', 'title' );
+is( $details->{'url'},       'http://search.cpan.org/~amoore/WWW-Reddit-0.02/',   'url' );
+
+
 
 
 

@@ -5,6 +5,7 @@ package WWW::Reddit; {
     
     use Object::InsideOut;
     use WWW::Mechanize;
+    use XML::RSS;
 
 =head1 NAME
 
@@ -12,11 +13,11 @@ WWW::Reddit - interface with reddit.com
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-    our $VERSION = '0.03';
+    our $VERSION = '0.04';
 
 
 =head1 SYNOPSIS
@@ -116,25 +117,30 @@ Version 0.03
                                              title => $args{'title'},
                                         }
                        );
-
-	my $uri = $mech->uri();
-        # http://reddit.com/info/abc123/comments/
-
-        if ( $uri =~ /info\/(\w+)\/comments\/$/ ) {
-            $self->set_id( $1 );
-        } else {
-            $self->set_id( undef );
-        }
+	$self->set_id( $self->get_id_from_url( $mech->uri() ) );
         
         return $self->get_id();
 
     }
 
+=head2 get_id
+
+  my $id = $r->get_id();
+
+  get the reddit ID of the current submission.
+
+=head2 set_id
+
+  $r->set_id( '63iup' );
+
+  pass in the ID of the reddit submission.
+
 =head2 details
 
   fetch the details for a reddit submission
 
-  takes no paramters, uses the id already in the object.
+  takes an optional reddit ID for a submisstion. Otherwise, uses the
+  ID already in the object.
 
   returns a hashref that looks like:
 
@@ -150,13 +156,18 @@ Version 0.03
     sub details {
       my $self = shift;
 
+      # If we have an ID passed in, set it.
+      if ( my $id = shift ) {
+          $self->set_id( $id );
+      }
+
       return unless $self->get_id();
 
       my $mech = $self->get_mech();
       my $url = sprintf( 'http://reddit.com/info/%s/details', $self->get_id );
       $mech->get( $url );
 
-      my $details = { submitted => undef,
+      my $details = { submitted => undef, # DD Mon YYYY
                       points    => undef,
                       upvotes   => undef,
                       downvotes => undef,
@@ -186,20 +197,75 @@ Version 0.03
 
     }
 
+=head2 get_ids_from_feed
+
+  my @listlist = $r->get_ids_from_feed();
+
+  fetches the RSS feed from reddit and returns the list of reddit IDS
+  in it. You can pass those IDs into the C<details> method to learn
+  more about them.
+
+=cut
+
+    sub get_ids_from_feed {
+        my $self = shift;
+        
+        my $mech = $self->get_mech();
+        $mech->get( 'http://www.reddit.com/.rss' );
+
+        my $parser = XML::RSS->new();
+        $parser->parse( $mech->content() );
+
+        my @idlist;
+        
+        # print the title and link of each RSS item
+        foreach my $item ( @{$parser->{'items'}} ) {
+            my $id = $self->get_id_from_url( $item->{'link'} );
+            push @idlist, $id if $id;
+        }
+        return @idlist;
+    }
+
+=head2 get_id_from_url
+
+  pass in a reddit url, and this method attempts to return the reddit
+  ID in it. This works on both URLs from the website and those from
+  the RSS feed.
+
+=cut
+
+    sub get_id_from_url {
+        my $self = shift;
+
+        my $url = shift or return;
+        if ( $url =~ /info\/(\w+)\/comments\/$/ ) {
+            # http://reddit.com/info/abc123/comments/
+            return $1;
+        } elsif ( $url =~ /goto\?rss=true&id=t3_(\w+)/ ) {
+            # http://reddit.com/goto?rss=true&id=t3_63kie
+            return $1
+        }
+        return;
+    }
 }
 
 =head1 AUTHOR
 
 Andrew Moore, C<< <amoore at cpan.org> >>
 
+=head1 USAGE NOTE
+
+reddit currently requires you to fill out a CAPTCHA to post a
+submission when using a relatively new account, or maybe one with low
+karma. This module does not circumvent that check. You therefore need
+to have a more established reddit account to use this module to submit
+to reddit. I do not have any intentions of changing this.
+
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-www-reddit at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Reddit>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-
-
 
 =head1 SUPPORT
 
@@ -227,6 +293,10 @@ L<http://cpanratings.perl.org/d/WWW-Reddit>
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/WWW-Reddit>
+
+=item * Google Code repository
+
+L<http://code.google.com/p/www-reddit/>
 
 =back
 

@@ -1,6 +1,12 @@
 Revision history for WWW-Reddit
 
-0.??    2007-??-??
+0.04    2007-12-21
+        * documented set_id and get_id methods
+        * details method allows you to pass an optional ID, which
+          becomes set.
+        * added get_ids_from_feed method, adding dependency on XML::RSS
+
+0.03    2007-12-20
         * details method returns "title" and "url" now, too
         * test suite no longer hits live site
         * fixed a version number problem
