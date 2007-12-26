@@ -1,5 +1,8 @@
 Revision history for WWW-Reddit
 
+0.05    2007-12-26
+        * added dependency on XML::RSS
+
 0.04    2007-12-21
         * documented set_id and get_id methods
         * details method allows you to pass an optional ID, which
