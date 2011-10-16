@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               WWW-Reddit
-version:            0.01
+version:            0.10
 abstract:           Perl extension for http://www.reddit.com, this module has been obsoleted and replaced by the Reddit module
 author:
     - jon <jon@>

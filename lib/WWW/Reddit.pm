@@ -1,6 +1,6 @@
 package WWW::Reddit;
 
-our $VERSION = '0.01';
+our $VERSION = '0.10';
 
 use 5.012004;
 use Data::Dumper;
