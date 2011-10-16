@@ -1,52 +1,40 @@
-WWW-Reddit
+WWW-Reddit version 0.01
+=======================
 
-reddit.com lets users post links to websites. This module lets you do
-that from your perl scripts.
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the
+README file from a module distribution so that people browsing the
+archive can use it get an idea of the modules uses. It is usually a
+good idea to provide version information here so that people can
+decide whether fixes for the module are worth downloading.
 
 INSTALLATION
 
-To install this module, run the following commands:
+To install this module type the following:
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+   perl Makefile.PL
+   make
+   make test
+   make install
 
-USAGE SUGGESTION
+DEPENDENCIES
 
-Since this module interacts with the reddit.com site in an automated
-fashion, it makes it easy to become very rude to the community based
-around that website. You are advised to not use it in a way that the
-owners and operators of reddit.com would prefer you not. Just as you
-would not pollute that community manually, please do not write a
-program to do it for you.
+This module requires these other modules and libraries:
 
-SUPPORT AND DOCUMENTATION
-
-After installing, you can find documentation for this module with the
-perldoc command.
-
-    perldoc WWW::Reddit
-
-You can also look for information at:
-
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Reddit
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/WWW-Reddit
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/WWW-Reddit
-
-    Search CPAN
-        http://search.cpan.org/dist/WWW-Reddit
-
+  blah blah blah
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2007 Andrew Moore
+Put the correct copyright and licence information here.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+Copyright (C) 2011 by jon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.4 or,
+at your option, any later version of Perl 5 you may have available.
+
 

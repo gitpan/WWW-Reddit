@@ -1,25 +1,6 @@
-Revision history for WWW-Reddit
+Revision history for Perl extension WWW::Reddit.
 
-0.05    2007-12-26
-        * added dependency on XML::RSS
+0.01  Sun Oct 16 16:22:26 2011
+	- original version; created by h2xs 1.23 with options
+		-X -n WWW::Reddit
 
-0.04    2007-12-21
-        * documented set_id and get_id methods
-        * details method allows you to pass an optional ID, which
-          becomes set.
-        * added get_ids_from_feed method, adding dependency on XML::RSS
-
-0.03    2007-12-20
-        * details method returns "title" and "url" now, too
-        * test suite no longer hits live site
-        * fixed a version number problem
-
-0.02    2007-12-19    Andrew Moore <amoore@cpan.org>
-        * shooting for first CPAN release
-        * added WWW::Reddit::details method
-        * fixed prerequisites in Makefile.PL
-        * Added note in README about being a good netizen
-        * added META.yml file
-
-0.01    2007-12-13    Andrew Moore <amoore@cpan.org>
-        First version, released on an unsuspecting world.

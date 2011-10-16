@@ -1,317 +1,239 @@
-package WWW::Reddit; {
+package WWW::Reddit;
 
-    use warnings;
-    use strict;
+our $VERSION = '0.01';
+
+use 5.012004;
+use Data::Dumper;
+
+use common::sense;
+
+use LWP::Simple;
+use JSON;
+
+use HTTP::Cookies;
+use LWP::UserAgent;
+
+my $base_url        = 'http://www.reddit.com/';
+my $api_url         = $base_url . 'api/';
+my $login_url       = $api_url . 'login';
+my $submit_url      = $api_url . 'submit';
+my $comment_url     = $api_url . 'comment';
+
+my $api_type        = 'json';
+
+sub new {
+    my $obj_class       = shift;
+    my $class = ref $obj_class || $obj_class;
+        
+    my ($user, $passwd, $subreddit) = @_;
+
+    my $self = {
+        base_url    => $base_url,
+        api_url     => $api_url,
+        
+        login_url   => $login_url,
+        submit_url  => $submit_url,
+
+        api_type    => $api_type,
+
+        user        => $user,
+        passwd      => $passwd,
+
+        subreddit   => $subreddit,
+
+        ua          => new LWP::UserAgent,
+        cookie_jar  => HTTP::Cookies->new,
+
+        modhash     => '',
+    };
+
+    bless $self, $class;
     
-    use Object::InsideOut;
-    use WWW::Mechanize;
-    use XML::RSS;
-
-=head1 NAME
-
-WWW::Reddit - interface with reddit.com
-
-=head1 VERSION
-
-Version 0.05
-
-=cut
-
-    our $VERSION = '0.05';
-
-
-=head1 SYNOPSIS
-
-    use WWW::Reddit;
-
-    my $r = WWW::Reddit->new( username => $username,
-                              password => $password );
-
-    $r->post( url   => 'http://www.example.com',
-              title => 'The new and wonderful example website' );
-
-=head1 METHODS
-
-=head2 new
-
-    used for instantiation.
-
-    my $r = WWW::Reddit->new( username => $username,
-                              password => $password );
-
-    required arguments:
-      username - your reddit.com username
-      password - your reddit.com password
-
-=cut
-
-    # Fields containing username and password
-    #  with standard get_* and set_* accessors
-    #  and automatic paramter processing upon object creation
-    my @username :Field :Std_All(username);
-    my @password :Field :Std_All(password);
-
-    # Field containing WWW::Mechanize objects
-    #   With combined accessor
-    #   no automatic parameter processing on object creation. We instantiate this object.
-    my @mech
-      :Field
-      :Type(WWW::Mechanize)
-      :Std(mech);
-
-    # Field containing the reddit ID for the current post.
-    #   combined accessor
-    #   no parameter procssing
-    my @id :Field :Std(id);
-
-    sub _init :Init {
-        my $self = shift;
-
-        $self->_login();
-
-    }
-
-    sub _login {
-        my $self = shift;
-
-        my $mech = WWW::Mechanize->new();
-
-        $mech->get( 'http://www.reddit.com/' );
-
-        $mech->submit_form( form_number => 2,
-                            fields      => { user_login   => $self->get_username(),
-                                             passwd_login => $self->get_password(),
-                                        }
-                       );
-
-        $self->set_mech( $mech );
-    }
-
-
-=head2 post
-
-    add a URL to reddit.com
-
-    my $id = $r->post( url   => 'http://www.example.com'
-                       title => 'The new and wonderful example website' );
-
-    required parameters:
-      url - the address of the url that you'd like to post
-      title - the title that you would like to have appear on reddit.
-
-    returns: the string that represents the reddit ID of the URL
-    posted.
-
-=cut
-
-    sub post {
-        my $self = shift;
-        my %args = @_;
-
-        my $mech = $self->get_mech();
-
-        $mech->get( 'http://reddit.com/submit' );
-
-        $mech->submit_form( form_number => 2,
-                            fields      => { url   => $args{'url'},
-                                             title => $args{'title'},
-                                        }
-                       );
-	$self->set_id( $self->get_id_from_url( $mech->uri() ) );
-        
-        return $self->get_id();
-
-    }
-
-=head2 get_id
-
-  my $id = $r->get_id();
-
-  get the reddit ID of the current submission.
-
-=head2 set_id
-
-  $r->set_id( '63iup' );
-
-  pass in the ID of the reddit submission.
-
-=head2 details
-
-  fetch the details for a reddit submission
-
-  takes an optional reddit ID for a submisstion. Otherwise, uses the
-  ID already in the object.
-
-  returns a hashref that looks like:
-
-     {
-       'submitted' => '29 Nov 2007',
-       'points'    => '2',
-       'upvotes'   => '17',
-       'downvotes' => '15'
-     };
-
-=cut
-
-    sub details {
-      my $self = shift;
-
-      # If we have an ID passed in, set it.
-      if ( my $id = shift ) {
-          $self->set_id( $id );
-      }
-
-      return unless $self->get_id();
-
-      my $mech = $self->get_mech();
-      my $url = sprintf( 'http://reddit.com/info/%s/details', $self->get_id );
-      $mech->get( $url );
-
-      my $details = { submitted => undef, # DD Mon YYYY
-                      points    => undef,
-                      upvotes   => undef,
-                      downvotes => undef,
-                      url       => undef,
-                      title     => undef,
-                 };
-      
-      my $body = $mech->content();
-      return unless $body;
-      if ( $body =~ /submitted<\/td><td>(\d+\s+\w+\s+\d+)<\/td>/i ) {
-          $details->{'submitted'} = $1;
-      }
-      if ( $body =~ /points<\/td><td>(\d+)<\/td>/i ) {
-          $details->{'points'} = $1;
-      }
-      if ( $body =~ /up votes<\/td><td>(\d+)<\/td>/i ) {
-          $details->{'upvotes'} = $1;
-      }
-      if ( $body =~ /down votes<\/td><td>(\d+)<\/td>/i ) {
-          $details->{'downvotes'} = $1;
-      }
-      if ( $body =~ /class="title loggedin\s*"\s*href="([^"]+)"\s*>(.+?)<\/a>/i ) {
-          $details->{'url'} = $1;
-          $details->{'title'} = $2;
-      }
-      return $details;
-
-    }
-
-=head2 get_ids_from_feed
-
-  my @listlist = $r->get_ids_from_feed();
-
-  fetches the RSS feed from reddit and returns the list of reddit IDS
-  in it. You can pass those IDs into the C<details> method to learn
-  more about them.
-
-=cut
-
-    sub get_ids_from_feed {
-        my $self = shift;
-        
-        my $mech = $self->get_mech();
-        $mech->get( 'http://www.reddit.com/.rss' );
-
-        my $parser = XML::RSS->new();
-        $parser->parse( $mech->content() );
-
-        my @idlist;
-        
-        # print the title and link of each RSS item
-        foreach my $item ( @{$parser->{'items'}} ) {
-            my $id = $self->get_id_from_url( $item->{'link'} );
-            push @idlist, $id if $id;
-        }
-        return @idlist;
-    }
-
-=head2 get_id_from_url
-
-  pass in a reddit url, and this method attempts to return the reddit
-  ID in it. This works on both URLs from the website and those from
-  the RSS feed.
-
-=cut
-
-    sub get_id_from_url {
-        my $self = shift;
-
-        my $url = shift or return;
-        if ( $url =~ /info\/(\w+)\/comments\/$/ ) {
-            # http://reddit.com/info/abc123/comments/
-            return $1;
-        } elsif ( $url =~ /goto\?rss=true&id=t3_(\w+)/ ) {
-            # http://reddit.com/goto?rss=true&id=t3_63kie
-            return $1
-        }
-        return;
+    $self->create_methods;
+    return $self;
+}
+
+#>-----------------------------------------------<#
+#  Helper Methods
+#>-----------------------------------------------<#
+
+# create accessor/mutator methods for defined parameters
+sub create_methods {
+    my $self = shift;
+    for my $datum (keys %{$self}) {
+        no strict "refs";
+        *$datum = sub {
+            my $self = shift;
+            $self->{$datum} = shift if @_;
+            return $self->{$datum};
+        };
     }
 }
 
+# Set cookie 
+sub set_cookie {
+    my $self        = shift;
+    my $response    = shift;    
+
+    $self->cookie_jar->extract_cookies ($response);
+    $self->ua->cookie_jar ($self->cookie_jar);
+    $self->parse_modhash ($response);
+}
+
+# Set modhash
+sub parse_modhash {
+    my $self        = shift;
+    my $response    = shift;
+
+    my $decoded = from_json ($response->content);
+    $self->modhash ($decoded->{json}{data}{modhash});
+}
+
+# takes link, returns post ID
+sub parse_link {
+    my $self = shift;
+    my $link = shift;
+
+    my ($id) = $link =~ /comments\/(\w+)\//i;
+    return $id;
+}
+
+#>---------------------------------------------------<#
+#  Main Methods
+#>---------------------------------------------------<#
+
+# Login to reddit
+sub login {
+    my $self = shift;
+    
+    if (@_) {
+        $self->user ($_[0]);
+        $self->passwd ($_[1]);
+    }
+    my $response = $self->ua->post($self->login_url,
+        {
+            api_type    => $self->api_type,
+            user        => $self->user,
+            passwd      => $self->passwd,
+        }
+    );
+
+    $self->set_cookie( $response);
+#   print Dumper $response;
+}
+
+# Submit link to reddit
+sub submit_link {
+    my $self = shift;
+    my ($title, $url, $subreddit) = @_;
+
+    my $kind        = 'link';
+
+    my $newpost     = $self->ua->post($self->submit_url,
+        {
+            uh      => $self->modhash,
+            kind    => $kind,
+            sr      => $subreddit || $self->subreddit,
+            title   => $title,
+            r       => $subreddit || $self->subreddit,
+            url     => $url,
+        }
+    );
+
+    my $json_content    = $newpost->content;
+    my $decoded         = from_json $json_content;
+
+    #returns link to new post if successful
+    my $link = $decoded->{jquery}[18][3][0];
+    my $id = $self->parse_link($link);
+
+    return $id, $link;
+}
+
+sub submit_story {
+    my $self = shift;
+    my ($title, $text, $subreddit) = @_;
+
+    my $kind        = 'self';
+
+    my $newpost     = $self->ua->post($self->submit_url,
+        {
+            uh       => $self->modhash,
+            kind     => $kind,
+            sr       => $subreddit || $self->subreddit,
+            r        => $subreddit || $self->subreddit,
+            title    => $title,
+            text     => $text,
+        },
+    );
+
+    my $json_content    = $newpost->content;
+    my $decoded         = from_json $json_content;
+
+    #returns id and link to new post if successful
+    my $link = $decoded->{jquery}[12][3][0];
+    my $id = $self->parse_link($link);
+
+    return $id, $link;
+}
+
+1;
+__END__
+
+=head1 NAME
+
+WWW::Reddit - Perl extension for http://www.reddit.com, this module has been obsoleted and replaced by the Reddit module
+
+=head1 SYNOPSIS
+
+  use Reddit;
+  
+  # $username, $password, [$subreddit]
+  $r = Reddit->new('Foo', 'Bar', 'Perl');
+
+  # optionally, you may specify $username, $passwd and $subreddit here
+  $r->login;
+
+  # $title, $url, [$subreddit]
+  # This overrides a subreddit set previously
+  $r->submit_link( 'Test', 'http://example.com', 'NotPerl');
+
+=head1 DESCRIPTION
+
+Perl module for interacting with Reddit.
+
+This module is still largely inprogress.
+
+=head2 Requires
+
+  common::sense
+  LWP::Simple
+  LWP::UserAgent
+  JSON
+  HTTP::Cookies
+
+  For Testing:
+  Data::Dumper
+
+=head2 EXPORT
+
+None.
+
+
+=head1 SEE ALSO
+
+https://github.com/reddit/reddit/wiki
+
 =head1 AUTHOR
 
-Andrew Moore, C<< <amoore at cpan.org> >>
+Jon A, E<lt>info[replacewithat]cyberspacelogistics[replacewithdot]comE<gt>
 
-=head1 USAGE NOTE
+=head1 COPYRIGHT AND LICENSE
 
-reddit currently requires you to fill out a CAPTCHA to post a
-submission when using a relatively new account, or maybe one with low
-karma. This module does not circumvent that check. You therefore need
-to have a more established reddit account to use this module to submit
-to reddit. I do not have any intentions of changing this.
+Copyright (C) 2011 by jon
 
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-www-reddit at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Reddit>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc WWW::Reddit
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Reddit>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/WWW-Reddit>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/WWW-Reddit>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/WWW-Reddit>
-
-=item * Google Code repository
-
-L<http://code.google.com/p/www-reddit/>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2007 Andrew Moore, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.4 or,
+at your option, any later version of Perl 5 you may have available.
 
 =cut
-
-1; # End of WWW::Reddit
