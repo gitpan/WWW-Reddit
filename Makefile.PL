@@ -1,19 +1,27 @@
-use 5.012004;
-use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
-WriteMakefile(
-    NAME              => 'WWW::Reddit',
-    VERSION_FROM      => 'lib/WWW/Reddit.pm', # finds $VERSION
-    PREREQ_PM         => {
-        'LWP::Simple'     => 0,
-        'LWP::UserAgent'  => 0,
-        'JSON'            => 0,
-        'HTTP::Cookies'   => 0,
-        'Data::Dumper'    => 0,
+#!perl -w
 
-    }, # e.g., Module::Name => 1.1
-    ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
-      (ABSTRACT_FROM  => 'lib/WWW/Reddit.pm', # retrieve abstract from module
-       AUTHOR         => 'jon <jon@>') : ()),
+require 5.008001;
+use strict;
+use warnings FATAL => 'all';
+use ExtUtils::MakeMaker;
+
+WriteMakefile(
+    NAME             => 'WWW::reddit',
+    DISTNAME		 => 'www-reddit',
+    VERSION_FROM     => 'lib/WWW/reddit.pm',
+    ABSTRACT   		 => 'reddit API interface',
+    AUTHOR           => q{Daniel Torres <daniel.torres@owasp.org>},  
+    LICENSE          => 'Artistic_2_0',
+    PL_FILES         => {},
+    MIN_PERL_VERSION => 5.008001,
+    PREREQ_PM => {
+        'Moose' => 0,
+        'Net::SSL' => 0,
+        'LWP::UserAgent' => 0,
+        'HTTP::Cookies' => 0,
+        'JSON' => 0,
+        'DeathByCaptcha::SocketClient' => 0,
+    },
+    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean => { FILES => 'WWW-reddit-*' },
 );

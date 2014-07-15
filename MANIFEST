@@ -1,7 +1,9 @@
 Changes
+lib/WWW/reddit.pm
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 README
-t/WWW-Reddit.t
-lib/WWW/Reddit.pm
-META.yml                                 Module meta-data (added by MakeMaker)
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
