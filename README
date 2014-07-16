@@ -28,21 +28,21 @@ SUPPORT AND DOCUMENTATION
 After installing, you can find documentation for this module with the
 perldoc command.
 
-    perldoc WWW::wordpress
+    perldoc WWW::Reddit
 
 You can also look for information at:
 
     RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-wordpress
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Reddit
 
     AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/WWW-wordpress
+        http://annocpan.org/dist/WWW-Reddit
 
     CPAN Ratings
-        http://cpanratings.perl.org/d/WWW-wordpress
+        http://cpanratings.perl.org/d/WWW-Reddit
 
     Search CPAN
-        http://search.cpan.org/dist/WWW-wordpress/
+        http://search.cpan.org/dist/WWW-Reddit/
 
 
 LICENSE AND COPYRIGHT

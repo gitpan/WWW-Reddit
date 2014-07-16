@@ -1,7 +1,7 @@
 # Aug 27 2012
 # reddit interface
 package WWW::Reddit;
-our $VERSION = '1.0';
+our $VERSION = '1.2';
 use Moose;
 use Data::Dumper;
 use Net::SSL (); # From Crypt-SSLeay
@@ -316,7 +316,7 @@ Usage:
 
    use WWW::Reddit;
    $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
-   my $reddit = WWW::reddit->new( username =>  'Reddit_user' ,
+   my $reddit = WWW::Reddit->new( username =>  'Reddit_user' ,
 					password => 'Reddit_pass',
 					Captcha_username => "deathcaptcha_user",
 					Captcha_pass => "deathcaptcha_pass");	                                 

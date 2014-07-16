@@ -14,5 +14,5 @@ inc/
 nytprof.out
 pod2htm*.tmp
 pm_to_blib
-WWW-reddit-*
-WWW-reddit-*.tar.gz
+WWW-Reddit-*
+WWW-Reddit-*.tar.gz

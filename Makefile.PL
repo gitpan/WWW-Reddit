@@ -6,9 +6,9 @@ use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    NAME             => 'WWW::reddit',
-    DISTNAME		 => 'www-reddit',
-    VERSION_FROM     => 'lib/WWW/reddit.pm',
+    NAME             => 'WWW::Reddit',
+    DISTNAME		 => 'WWW-Reddit',
+    VERSION_FROM     => 'lib/WWW/Reddit.pm',
     ABSTRACT   		 => 'reddit API interface',
     AUTHOR           => q{Daniel Torres <daniel.torres@owasp.org>},  
     LICENSE          => 'Artistic_2_0',
@@ -23,5 +23,5 @@ WriteMakefile(
         'DeathByCaptcha::SocketClient' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'WWW-reddit-*' },
+    clean => { FILES => 'WWW-Reddit-*' },
 );

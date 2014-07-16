@@ -7,7 +7,7 @@ use Test::More;
 plan tests => 1;
 
 BEGIN {
-    use_ok( 'WWW::reddit' ) || print "Bail out!\n";
+    use_ok( 'WWW::Reddit' ) || print "Bail out!\n";
 }
 
-diag( "Testing WWW::reddit $WWW::reddit::VERSION, Perl $], $^X" );
+diag( "Testing WWW::Reddit $WWW::Reddit::VERSION, Perl $], $^X" );
