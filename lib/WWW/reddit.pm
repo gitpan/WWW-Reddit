@@ -1,6 +1,6 @@
 # Aug 27 2012
 # reddit interface
-package WWW::reddit;
+package WWW::Reddit;
 our $VERSION = '1.0';
 use Moose;
 use Data::Dumper;
@@ -306,7 +306,7 @@ __END__
 
 =head1 NAME
 
-WWW::reddit - reddit interface (No API) .
+WWW::Reddit - reddit interface (No API) .
 
 
 =head1 SYNOPSIS
@@ -314,9 +314,9 @@ WWW::reddit - reddit interface (No API) .
 
 Usage:
 
-   use www::reddit;
+   use WWW::Reddit;
    $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
-   my $reddit = reddit->new( username =>  'Reddit_user' ,
+   my $reddit = WWW::reddit->new( username =>  'Reddit_user' ,
 					password => 'Reddit_pass',
 					Captcha_username => "deathcaptcha_user",
 					Captcha_pass => "deathcaptcha_pass");	                                 
@@ -332,7 +332,7 @@ reddit interface (No API)
 
 =head2 constructor
 
-       my $reddit = www::reddit->new( username =>  'Reddit_user' ,
+       my $reddit = WWW::Reddit->new( username =>  'Reddit_user' ,
 					password => 'Reddit_pass',
 					Captcha_username => "deathcaptcha_user",
 					Captcha_pass => "deathcaptcha_pass!");	
